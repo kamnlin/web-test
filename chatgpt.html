@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>專注倒數計時器</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1220;--panel:#151f30;--line:#2d3a4e;--text:#f4f7ff;--muted:#a9b7cd;--accent:#70e1cb;--accent2:#70a8ff}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:28px 16px;background:radial-gradient(circle at 15% 5%,#193b4a 0,transparent 38%),radial-gradient(circle at 95% 95%,#202a59 0,transparent 45%),var(--bg);font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--text)}
+    main{width:min(100%,560px);padding:clamp(25px,6vw,48px);border:1px solid #ffffff1b;border-radius:28px;background:linear-gradient(145deg,#1b2739f5,#121c2df5);box-shadow:0 25px 70px #0008;text-align:center}
+    .eyebrow{font-size:12px;font-weight:800;letter-spacing:3px;color:var(--accent);text-transform:uppercase}h1{font-size:clamp(25px,5vw,34px);letter-spacing:1px;margin:12px 0 8px}.subtitle{margin:0;color:var(--muted);font-size:14px}
+    .timer-wrap{position:relative;width:min(100%,350px);aspect-ratio:1;margin:28px auto 24px;display:grid;place-items:center}.ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}.ring circle{fill:none;stroke-width:9}.ring .track{stroke:#2a394d}.ring .progress{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .15s linear,stroke .2s;filter:drop-shadow(0 0 6px #70e1cb40)}.display{position:relative}.time{font-size:clamp(45px,9vw,67px);font-weight:750;letter-spacing:-2px;font-variant-numeric:tabular-nums}.status{font-size:14px;margin-top:3px;color:var(--muted)}
+    .fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:5px 0 20px}.field label{display:block;color:var(--muted);margin-bottom:7px;font-size:13px}.field input{width:100%;border:1px solid var(--line);border-radius:12px;background:#0d1727;color:white;text-align:center;font-size:21px;font-variant-numeric:tabular-nums;padding:11px 5px;outline:none}.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #70e1cb20}.field input:disabled{opacity:.55}
+    .presets{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-bottom:22px}button{font:inherit;cursor:pointer;transition:transform .15s,background .2s,border-color .2s}button:active{transform:scale(.97)}button:focus-visible{outline:3px solid var(--accent2);outline-offset:3px}.preset{border:1px solid var(--line);border-radius:999px;background:#202d41;color:#d3deef;font-size:13px;padding:9px 16px}.preset:hover{background:#2c4157}.actions{display:grid;grid-template-columns:1.25fr 1fr;gap:12px}.actions button{border-radius:14px;padding:15px 12px;font-size:17px;font-weight:750;border:1px solid var(--line)}.primary{background:var(--accent);border-color:var(--accent)!important;color:#10252b}.primary:hover{background:#95eddb}.secondary{background:#263349;color:var(--text)}.secondary:hover{background:#334762}.footer{margin-top:22px;display:flex;justify-content:center;align-items:center;gap:8px;color:var(--muted);font-size:13px}.footer input{accent-color:var(--accent);width:16px;height:16px}.notice{min-height:23px;margin-top:12px;color:#f5c97e;font-size:13px}@media(max-width:380px){main{padding:24px 18px}.time{font-size:43px}.preset{padding:8px 11px}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">FOCUS & TIME</div>
+    <h1>倒數計時器</h1>
+    <p class="subtitle">設定時間，專注完成眼前的每一件事</p>
+    <div class="timer-wrap" role="timer" aria-live="off" aria-label="剩餘時間">
+      <svg class="ring" viewBox="0 0 360 360" aria-hidden="true"><circle class="track" cx="180" cy="180" r="166"/><circle id="progress" class="progress" cx="180" cy="180" r="166"/></svg>
+      <div class="display"><div id="display" class="time">05:00</div><div id="status" class="status" aria-live="polite">準備開始</div></div>
+    </div>
+    <div class="fields" aria-label="設定倒數時間">
+      <div class="field"><label for="hours">小時</label><input id="hours" type="number" min="0" max="99" step="1" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="minutes">分鐘</label><input id="minutes" type="number" min="0" max="59" step="1" value="5" inputmode="numeric"></div>
+      <div class="field"><label for="seconds">秒數</label><input id="seconds" type="number" min="0" max="59" step="1" value="0" inputmode="numeric"></div>
+    </div>
+    <div class="presets" aria-label="快速設定時間"><button class="preset" data-seconds="60">1 分鐘</button><button class="preset" data-seconds="300">5 分鐘</button><button class="preset" data-seconds="600">10 分鐘</button><button class="preset" data-seconds="1500">25 分鐘</button></div>
+    <div class="actions"><button id="toggle" class="primary">▶ 開始</button><button id="reset" class="secondary">↺ 重設</button></div>
+    <label class="footer"><input id="sound" type="checkbox" checked> 倒數結束時播放提示音</label>
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+  </main>
+  <script>
+    (()=>{
+      'use strict';
+      const $=id=>document.getElementById(id);
+      const inputs=[$('hours'),$('minutes'),$('seconds')];
+      const display=$('display'),status=$('status'),toggle=$('toggle'),progress=$('progress'),notice=$('notice');
+      const circumference=2*Math.PI*166;
+      progress.style.strokeDasharray=String(circumference);
+      let duration=300,remainingMs=duration*1000,running=false,endTime=0,frame=0,audioContext=null;
+      const clamp=(n,low,high)=>Math.max(low,Math.min(high,Number.isFinite(n)?n:0));
+      const readDuration=()=>clamp(parseInt(inputs[0].value,10),0,99)*3600+clamp(parseInt(inputs[1].value,10),0,59)*60+clamp(parseInt(inputs[2].value,10),0,59);
+      const setInputs=total=>{inputs[0].value=Math.floor(total/3600);inputs[1].value=Math.floor(total%3600/60);inputs[2].value=total%60};
+      const format=ms=>{const s=Math.ceil(Math.max(0,ms)/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')};
+      const render=()=>{display.textContent=format(remainingMs);const proportion=duration>0?Math.max(0,Math.min(1,remainingMs/(duration*1000))):0;progress.style.strokeDashoffset=String(circumference*(1-proportion));document.title=format(remainingMs)+'｜倒數計時器'};
+      const syncInputs=()=>{duration=readDuration();setInputs(duration);remainingMs=duration*1000;notice.textContent='';status.textContent='準備開始';render()};
+      const beep=()=>{if(!$('sound').checked)return;try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;audioContext=audioContext||new Ctx();if(audioContext.state==='suspended')audioContext.resume();for(let i=0;i<3;i++){let osc=audioContext.createOscillator(),gain=audioContext.createGain(),t=audioContext.currentTime+i*.3;osc.type='sine';osc.frequency.value=780;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.18,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+.22);osc.connect(gain);gain.connect(audioContext.destination);osc.start(t);osc.stop(t+.24)}}catch(e){/* Sound may be blocked by browser settings. */}};
+      const finish=()=>{running=false;cancelAnimationFrame(frame);remainingMs=0;toggle.textContent='▶ 重新開始';status.textContent='時間到！';notice.textContent='⏰ 倒數完成，辛苦了！';inputs.forEach(x=>x.disabled=false);render();beep()};
+      const tick=()=>{if(!running)return;remainingMs=Math.max(0,endTime-performance.now());render();if(remainingMs<=0){finish();return}frame=requestAnimationFrame(tick)};
+      toggle.addEventListener('click',()=>{if(running){remainingMs=Math.max(0,endTime-performance.now());running=false;cancelAnimationFrame(frame);toggle.textContent='▶ 繼續';status.textContent='已暫停';render();return}
+        if(remainingMs<=0){duration=readDuration();remainingMs=duration*1000}
+        if(duration<=0){notice.textContent='請先設定大於 0 秒的時間';return}
+        notice.textContent='';running=true;endTime=performance.now()+remainingMs;inputs.forEach(x=>x.disabled=true);toggle.textContent='Ⅱ 暫停';status.textContent='倒數進行中';tick()});
+      $('reset').addEventListener('click',()=>{running=false;cancelAnimationFrame(frame);inputs.forEach(x=>x.disabled=false);duration=readDuration();remainingMs=duration*1000;toggle.textContent='▶ 開始';status.textContent='準備開始';notice.textContent='';render()});
+      inputs.forEach(x=>x.addEventListener('change',()=>{if(!running){syncInputs();toggle.textContent='▶ 開始'}}));
+      document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{running=false;cancelAnimationFrame(frame);inputs.forEach(x=>x.disabled=false);setInputs(Number(b.dataset.seconds));syncInputs();toggle.textContent='▶ 開始'}));
+      render();
+    })();
+  </script>
+</body>
+</html>
