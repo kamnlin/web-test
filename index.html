@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>現代質感倒數計時器</title>
+    <title>夢幻少女風倒數計時器 ♡</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Tone.js 用於產生提示音效 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- 引入 Google Fonts (Inter & JetBrains Mono) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- 引入圓潤可愛字體 Quicksand & 思源黑體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Quicksand', 'Noto Sans TC', sans-serif;
+            background-image: radial-gradient(#fbcfe8 1px, transparent 1px), radial-gradient(#fce7f3 1px, #fff1f2 1px);
+            background-size: 32px 32px;
+            background-position: 0 0, 16px 16px;
         }
-        .font-mono-num {
-            font-family: 'JetBrains Mono', monospace;
+        .font-cute-num {
+            font-family: 'Quicksand', sans-serif;
             font-variant-numeric: tabular-nums;
         }
         /* 自訂輸入框隱藏上下箭頭 */
@@ -33,101 +36,114 @@
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
         }
+        /* 輕柔漂浮動畫 */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(4deg); }
+        }
+        .animate-float {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+<body class="text-rose-900 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-pink-300 selection:text-rose-950">
 
     <!-- 主容器 -->
-    <main class="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+    <main class="w-full max-w-md bg-white/85 backdrop-blur-xl border-2 border-pink-200/80 rounded-[2.5rem] p-6 sm:p-8 shadow-[0_20px_50px_rgba(244,114,182,0.22)] relative overflow-hidden">
         
-        <!-- 頂部裝飾光暈 -->
-        <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- 頂部夢幻粉彩光暈與小愛心裝飾 -->
+        <div class="absolute -top-20 -left-20 w-48 h-48 bg-pink-300/35 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -right-20 w-48 h-48 bg-purple-300/30 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-5 right-20 text-pink-300/70 animate-float pointer-events-none select-none text-lg">♡</div>
+        <div class="absolute bottom-24 left-6 text-rose-300/70 animate-float pointer-events-none select-none text-sm" style="animation-delay: 1.2s;">✦</div>
 
         <!-- 標題列 -->
-        <header class="flex items-center justify-between mb-6 relative z-10">
+        <header class="flex items-center justify-between mb-5 relative z-10">
             <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-400 shadow-md shadow-pink-300/50 flex items-center justify-center text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                 </div>
-                <h1 class="text-lg font-semibold tracking-tight text-slate-100">專注倒數計時</h1>
+                <h1 class="text-lg font-bold tracking-wide text-rose-800">甜心倒數計時</h1>
             </div>
             
             <!-- 音效開關按鈕 -->
-            <button id="soundToggle" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/50 transition-all" title="切換提示音效">
-                <svg id="soundOnIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="soundToggle" class="p-2.5 rounded-2xl bg-pink-50 hover:bg-pink-100 text-pink-500 hover:text-rose-600 border border-pink-200 transition-all shadow-sm" title="切換提示音效">
+                <svg id="soundOnIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
                 </svg>
-                <svg id="soundOffIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="soundOffIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-pink-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
                 </svg>
             </button>
         </header>
 
         <!-- 圓形進度條與時間顯示區 -->
-        <div class="relative flex items-center justify-center my-6">
-            <svg class="w-64 h-64 sm:w-72 sm:h-72" viewBox="0 0 260 260">
+        <div class="relative flex items-center justify-center my-5">
+            <!-- 內圈柔白底色圓盤 -->
+            <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-full bg-gradient-to-b from-white to-pink-50/90 shadow-inner border border-pink-100 absolute"></div>
+
+            <svg class="w-64 h-64 sm:w-72 sm:h-72 relative z-10" viewBox="0 0 260 260">
                 <!-- 背景軌道 -->
                 <circle
-                    class="text-slate-800"
-                    stroke-width="8"
+                    class="text-pink-100"
+                    stroke-width="10"
                     stroke="currentColor"
                     fill="transparent"
-                    r="116"
+                    r="114"
                     cx="130"
                     cy="130"
                 />
                 <!-- 動態進度條 -->
                 <circle
                     id="progressCircle"
-                    class="progress-ring__circle text-indigo-500"
-                    stroke-width="8"
-                    stroke-dasharray="728.85"
+                    class="progress-ring__circle text-pink-400"
+                    stroke-width="10"
+                    stroke-dasharray="716.28"
                     stroke-dashoffset="0"
                     stroke-linecap="round"
                     stroke="currentColor"
                     fill="transparent"
-                    r="116"
+                    r="114"
                     cx="130"
                     cy="130"
                 />
             </svg>
 
             <!-- 中央時間顯示 / 輸入面板 -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="absolute inset-0 flex flex-col items-center justify-center z-20">
                 <!-- 狀態標籤 -->
-                <span id="statusBadge" class="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-2 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
-                    準備就緒
+                <span id="statusBadge" class="text-xs font-bold tracking-wider text-pink-600 mb-2 bg-pink-100/90 px-3.5 py-1 rounded-full border border-pink-200 shadow-xs">
+                    ♡ 準備就緒 ♡
                 </span>
 
                 <!-- 倒數數字顯示 (執行與暫停時顯示) -->
-                <div id="timeDisplay" class="font-mono-num text-4xl sm:text-5xl font-bold tracking-tight text-white">
+                <div id="timeDisplay" class="font-cute-num text-4xl sm:text-5xl font-bold tracking-tight text-rose-800 drop-shadow-xs">
                     05:00
                 </div>
 
                 <!-- 時間設定輸入框 (閒置時可點擊編輯) -->
-                <div id="timeInputs" class="hidden flex items-center justify-center gap-1 text-white">
+                <div id="timeInputs" class="hidden flex items-center justify-center gap-1 text-rose-800">
                     <div class="flex flex-col items-center">
-                        <input type="number" id="inputHours" min="0" max="99" value="0" class="font-mono-num w-14 text-center text-3xl font-bold bg-slate-800/90 border border-slate-700 rounded-xl py-1 focus:outline-none focus:border-indigo-500" aria-label="小時">
-                        <span class="text-[10px] text-slate-400 mt-1">時</span>
+                        <input type="number" id="inputHours" min="0" max="99" value="0" class="font-cute-num w-14 text-center text-3xl font-bold bg-pink-50 border-2 border-pink-200 rounded-2xl py-1 text-rose-800 focus:outline-none focus:border-pink-400 focus:bg-white" aria-label="小時">
+                        <span class="text-[11px] font-medium text-pink-400 mt-1">時</span>
                     </div>
-                    <span class="text-2xl font-bold text-slate-500 pb-4">:</span>
+                    <span class="text-2xl font-bold text-pink-300 pb-4">:</span>
                     <div class="flex flex-col items-center">
-                        <input type="number" id="inputMinutes" min="0" max="59" value="5" class="font-mono-num w-14 text-center text-3xl font-bold bg-slate-800/90 border border-slate-700 rounded-xl py-1 focus:outline-none focus:border-indigo-500" aria-label="分鐘">
-                        <span class="text-[10px] text-slate-400 mt-1">分</span>
+                        <input type="number" id="inputMinutes" min="0" max="59" value="5" class="font-cute-num w-14 text-center text-3xl font-bold bg-pink-50 border-2 border-pink-200 rounded-2xl py-1 text-rose-800 focus:outline-none focus:border-pink-400 focus:bg-white" aria-label="分鐘">
+                        <span class="text-[11px] font-medium text-pink-400 mt-1">分</span>
                     </div>
-                    <span class="text-2xl font-bold text-slate-500 pb-4">:</span>
+                    <span class="text-2xl font-bold text-pink-300 pb-4">:</span>
                     <div class="flex flex-col items-center">
-                        <input type="number" id="inputSeconds" min="0" max="59" value="0" class="font-mono-num w-14 text-center text-3xl font-bold bg-slate-800/90 border border-slate-700 rounded-xl py-1 focus:outline-none focus:border-indigo-500" aria-label="秒">
-                        <span class="text-[10px] text-slate-400 mt-1">秒</span>
+                        <input type="number" id="inputSeconds" min="0" max="59" value="0" class="font-cute-num w-14 text-center text-3xl font-bold bg-pink-50 border-2 border-pink-200 rounded-2xl py-1 text-rose-800 focus:outline-none focus:border-pink-400 focus:bg-white" aria-label="秒">
+                        <span class="text-[11px] font-medium text-pink-400 mt-1">秒</span>
                     </div>
                 </div>
 
                 <!-- 切換編輯按鈕 -->
-                <button id="editTimeBtn" class="mt-3 text-xs text-slate-400 hover:text-indigo-400 flex items-center gap-1 transition-colors py-1 px-2 rounded-lg hover:bg-slate-800/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button id="editTimeBtn" class="mt-3 text-xs font-medium text-pink-500 hover:text-rose-600 flex items-center gap-1 transition-colors py-1 px-3 rounded-full hover:bg-pink-100/70">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
                     </svg>
                     <span id="editBtnText">自訂時間</span>
@@ -136,50 +152,48 @@
         </div>
 
         <!-- 快速預設時間按鈕 -->
-        <div id="presetContainer" class="grid grid-cols-4 gap-2 mb-6">
-            <button data-seconds="60" class="preset-btn py-2 px-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 text-xs font-medium text-slate-300 hover:text-white transition-all active:scale-95">
+        <div id="presetContainer" class="grid grid-cols-4 gap-2 mb-6 relative z-10">
+            <button data-seconds="60" class="preset-btn py-2 px-2 rounded-2xl bg-pink-50/90 hover:bg-pink-100 border border-pink-200/80 text-xs font-bold text-pink-600 hover:text-rose-700 transition-all active:scale-95 shadow-2xs">
                 1 分鐘
             </button>
-            <button data-seconds="300" class="preset-btn py-2 px-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 text-xs font-medium text-slate-300 hover:text-white transition-all active:scale-95">
+            <button data-seconds="300" class="preset-btn py-2 px-2 rounded-2xl bg-pink-50/90 hover:bg-pink-100 border border-pink-200/80 text-xs font-bold text-pink-600 hover:text-rose-700 transition-all active:scale-95 shadow-2xs">
                 5 分鐘
             </button>
-            <button data-seconds="900" class="preset-btn py-2 px-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 text-xs font-medium text-slate-300 hover:text-white transition-all active:scale-95">
+            <button data-seconds="900" class="preset-btn py-2 px-2 rounded-2xl bg-pink-50/90 hover:bg-pink-100 border border-pink-200/80 text-xs font-bold text-pink-600 hover:text-rose-700 transition-all active:scale-95 shadow-2xs">
                 15 分鐘
             </button>
-            <button data-seconds="1500" class="preset-btn py-2 px-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 text-xs font-medium text-slate-300 hover:text-white transition-all active:scale-95">
+            <button data-seconds="1500" class="preset-btn py-2 px-2 rounded-2xl bg-pink-50/90 hover:bg-pink-100 border border-pink-200/80 text-xs font-bold text-pink-600 hover:text-rose-700 transition-all active:scale-95 shadow-2xs">
                 25 分鐘
             </button>
         </div>
 
         <!-- 主要控制按鈕列 -->
-        <div class="flex items-center gap-3">
-            <button id="startPauseBtn" class="flex-1 py-3.5 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-semibold shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all">
+        <div class="flex items-center gap-3 relative z-10">
+            <button id="startPauseBtn" class="flex-1 py-3.5 px-6 rounded-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 active:scale-[0.98] text-white font-bold shadow-lg shadow-pink-300/50 flex items-center justify-center gap-2 transition-all">
                 <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                     <polygon points="5 3 19 12 5 21 5 3"/>
                 </svg>
                 <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current hidden" viewBox="0 0 24 24">
-                    <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+                    <rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/>
                 </svg>
                 <span id="startPauseText">開始倒數</span>
             </button>
 
-            <button id="resetBtn" class="p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-300 hover:text-white border border-slate-700/50 transition-all" title="重設時間">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="resetBtn" class="p-3.5 rounded-full bg-pink-50 hover:bg-pink-100 active:scale-[0.98] text-pink-500 hover:text-rose-600 border border-pink-200 transition-all shadow-sm" title="重設時間">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
                 </svg>
             </button>
         </div>
 
         <!-- 訊息通知橫幅 (替代 alert) -->
-        <div id="messageBox" class="hidden mt-5 p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-sm flex items-center justify-between animate-fade-in">
+        <div id="messageBox" class="hidden mt-5 p-3.5 rounded-2xl bg-pink-100/90 border border-pink-300 text-rose-700 text-sm font-medium flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                <span id="messageText">時間到！倒數已完成。</span>
+                <span class="text-base">🎀</span>
+                <span id="messageText">時間到囉！休息一下吧 ♡</span>
             </div>
-            <button id="closeMessageBtn" class="text-emerald-400 hover:text-emerald-200 p-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="closeMessageBtn" class="text-pink-500 hover:text-rose-700 p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
             </button>
@@ -188,7 +202,7 @@
 
     <script>
         /**
-         * 倒數計時器核心邏輯
+         * 少女風倒數計時器核心邏輯
          */
         document.addEventListener('DOMContentLoaded', () => {
             // DOM 元素參照
@@ -218,8 +232,8 @@
             const messageText = document.getElementById('messageText');
             const closeMessageBtn = document.getElementById('closeMessageBtn');
 
-            // 圓形進度條周長計算 (2 * PI * r, r=116)
-            const radius = 116;
+            // 圓形進度條周長計算 (2 * PI * r, r=114)
+            const radius = 114;
             const circumference = 2 * Math.PI * radius;
             progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
             progressCircle.style.strokeDashoffset = 0;
@@ -248,45 +262,45 @@
             // 更新畫面顯示與進度環
             function updateDisplay() {
                 timeDisplay.textContent = formatTime(remainingSeconds);
-                document.title = isRunning ? `(${formatTime(remainingSeconds)}) 倒數計時器` : '現代質感倒數計時器';
+                document.title = isRunning ? `(${formatTime(remainingSeconds)}) 甜心倒數計時 ♡` : '夢幻少女風倒數計時器 ♡';
 
                 // 更新進度環
                 const progress = totalSeconds > 0 ? remainingSeconds / totalSeconds : 0;
                 const offset = circumference - progress * circumference;
                 progressCircle.style.strokeDashoffset = offset;
 
-                // 最後 10 秒變色提醒
+                // 顏色變化：最後 10 秒轉為蜜桃橘，完成時轉為薰衣草紫
                 if (remainingSeconds <= 10 && remainingSeconds > 0 && isRunning) {
-                    progressCircle.classList.remove('text-indigo-500', 'text-emerald-500');
-                    progressCircle.classList.add('text-amber-500');
+                    progressCircle.classList.remove('text-pink-400', 'text-purple-400');
+                    progressCircle.classList.add('text-orange-400');
                 } else if (remainingSeconds === 0) {
-                    progressCircle.classList.remove('text-indigo-500', 'text-amber-500');
-                    progressCircle.classList.add('text-emerald-500');
+                    progressCircle.classList.remove('text-pink-400', 'text-orange-400');
+                    progressCircle.classList.add('text-purple-400');
                 } else {
-                    progressCircle.classList.remove('text-amber-500', 'text-emerald-500');
-                    progressCircle.classList.add('text-indigo-500');
+                    progressCircle.classList.remove('text-orange-400', 'text-purple-400');
+                    progressCircle.classList.add('text-pink-400');
                 }
             }
 
-            // 播放提示音效 (使用 Tone.js 合成和弦鈴聲)
+            // 播放甜美八音盒風格提示音效
             async function playAlarmSound() {
                 if (!isSoundEnabled) return;
                 try {
                     await Tone.start();
                     const synth = new Tone.PolySynth(Tone.Synth, {
-                        oscillator: { type: "triangle" },
+                        oscillator: { type: "sine" },
                         envelope: {
-                            attack: 0.02,
-                            decay: 0.3,
-                            sustain: 0.2,
-                            release: 1
+                            attack: 0.01,
+                            decay: 0.35,
+                            sustain: 0.15,
+                            release: 1.2
                         }
                     }).toDestination();
 
                     const now = Tone.now();
-                    synth.triggerAttackRelease(["C5", "E5", "G5"], "8n", now);
-                    synth.triggerAttackRelease(["E5", "G5", "C6"], "4n", now + 0.25);
-                    synth.triggerAttackRelease(["G5", "C6", "E6"], "2n", now + 0.55);
+                    synth.triggerAttackRelease(["E5", "G#5", "B5"], "8n", now);
+                    synth.triggerAttackRelease(["F#5", "A5", "C#6"], "8n", now + 0.22);
+                    synth.triggerAttackRelease(["G#5", "B5", "E6"], "2n", now + 0.45);
                 } catch (e) {
                     console.warn("音效播放受限:", e);
                 }
@@ -295,11 +309,11 @@
             // 顯示訊息提示框
             function showMessage(text, isError = false) {
                 messageText.textContent = text;
-                messageBox.classList.remove('hidden', 'bg-emerald-500/15', 'border-emerald-500/30', 'text-emerald-300', 'bg-rose-500/15', 'border-rose-500/30', 'text-rose-300');
+                messageBox.classList.remove('hidden', 'bg-pink-100/90', 'border-pink-300', 'text-rose-700', 'bg-rose-100', 'border-rose-300', 'text-rose-800');
                 if (isError) {
-                    messageBox.classList.add('bg-rose-500/15', 'border-rose-500/30', 'text-rose-300');
+                    messageBox.classList.add('bg-rose-100', 'border-rose-300', 'text-rose-800');
                 } else {
-                    messageBox.classList.add('bg-emerald-500/15', 'border-emerald-500/30', 'text-emerald-300');
+                    messageBox.classList.add('bg-pink-100/90', 'border-pink-300', 'text-rose-700');
                 }
             }
 
@@ -313,7 +327,6 @@
                 isEditing = forceState !== null ? forceState : !isEditing;
 
                 if (isEditing) {
-                    // 填入目前剩餘時間到輸入框
                     inputHours.value = Math.floor(remainingSeconds / 3600);
                     inputMinutes.value = Math.floor((remainingSeconds % 3600) / 60);
                     inputSeconds.value = remainingSeconds % 60;
@@ -321,10 +334,9 @@
                     timeDisplay.classList.add('hidden');
                     timeInputs.classList.remove('hidden');
                     editBtnText.textContent = '確認設定';
-                    statusBadge.textContent = '設定時間';
+                    statusBadge.textContent = '✦ 設定時間 ✦';
                     inputMinutes.focus();
                 } else {
-                    // 讀取輸入框並驗證
                     let h = Math.max(0, Math.min(99, parseInt(inputHours.value) || 0));
                     let m = Math.max(0, Math.min(59, parseInt(inputMinutes.value) || 0));
                     let s = Math.max(0, Math.min(59, parseInt(inputSeconds.value) || 0));
@@ -335,13 +347,13 @@
                         remainingSeconds = newTotal;
                         hideMessage();
                     } else {
-                        showMessage('請設定大於 0 秒的時間。', true);
+                        showMessage('請設定大於 0 秒的時間唷 ♡', true);
                     }
 
                     timeInputs.classList.add('hidden');
                     timeDisplay.classList.remove('hidden');
                     editBtnText.textContent = '自訂時間';
-                    statusBadge.textContent = '準備就緒';
+                    statusBadge.textContent = '♡ 準備就緒 ♡';
                     updateDisplay();
                 }
             }
@@ -355,11 +367,10 @@
                     remainingSeconds = totalSeconds;
                 }
                 if (remainingSeconds <= 0) {
-                    showMessage('請先設定倒數時間！', true);
+                    showMessage('請先設定倒數時間唷！', true);
                     return;
                 }
 
-                // 預先解鎖 Tone.js 音訊環境
                 if (isSoundEnabled && Tone.context.state !== 'running') {
                     Tone.start().catch(() => {});
                 }
@@ -390,7 +401,7 @@
                 clearInterval(timerInterval);
                 isRunning = false;
                 updateControlsUI();
-                statusBadge.textContent = '已暫停';
+                statusBadge.textContent = '☁ 休息暫停中';
             }
 
             // 計時完成
@@ -398,9 +409,9 @@
                 clearInterval(timerInterval);
                 isRunning = false;
                 updateControlsUI();
-                statusBadge.textContent = '計時完成';
+                statusBadge.textContent = '✨ 倒數完成 ✨';
                 playAlarmSound();
-                showMessage('時間到！倒數計時已完成。');
+                showMessage('時間到囉！辛苦啦，喝口水休息一下吧 ♡');
             }
 
             // 重設計時器
@@ -413,23 +424,23 @@
                 remainingSeconds = totalSeconds;
                 hideMessage();
                 updateControlsUI();
-                statusBadge.textContent = '準備就緒';
+                statusBadge.textContent = '♡ 準備就緒 ♡';
                 updateDisplay();
             }
 
             // 更新按鈕狀態外觀
             function updateControlsUI() {
                 if (isRunning) {
-                    startPauseBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500', 'shadow-indigo-600/25');
-                    startPauseBtn.classList.add('bg-amber-600', 'hover:bg-amber-500', 'shadow-amber-600/25');
+                    startPauseBtn.classList.remove('from-pink-400', 'to-rose-400', 'hover:from-pink-500', 'hover:to-rose-500', 'shadow-pink-300/50');
+                    startPauseBtn.classList.add('from-purple-400', 'to-pink-400', 'hover:from-purple-500', 'hover:to-pink-500', 'shadow-purple-300/50');
                     startPauseText.textContent = '暫停';
                     playIcon.classList.add('hidden');
                     pauseIcon.classList.remove('hidden');
-                    statusBadge.textContent = '計時中...';
+                    statusBadge.textContent = '✿ 努力計時中 ✿';
                     editTimeBtn.classList.add('opacity-40', 'pointer-events-none');
                 } else {
-                    startPauseBtn.classList.remove('bg-amber-600', 'hover:bg-amber-500', 'shadow-amber-600/25');
-                    startPauseBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'shadow-indigo-600/25');
+                    startPauseBtn.classList.remove('from-purple-400', 'to-pink-400', 'hover:from-purple-500', 'hover:to-pink-500', 'shadow-purple-300/50');
+                    startPauseBtn.classList.add('from-pink-400', 'to-rose-400', 'hover:from-pink-500', 'hover:to-rose-500', 'shadow-pink-300/50');
                     startPauseText.textContent = remainingSeconds < totalSeconds && remainingSeconds > 0 ? '繼續倒數' : '開始倒數';
                     playIcon.classList.remove('hidden');
                     pauseIcon.classList.add('hidden');
@@ -450,7 +461,6 @@
 
             editTimeBtn.addEventListener('click', () => toggleEditMode());
 
-            // 按 Enter 鍵確認自訂時間
             [inputHours, inputMinutes, inputSeconds].forEach(input => {
                 input.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
@@ -459,7 +469,6 @@
                 });
             });
 
-            // 快速預設時間按鈕
             presetBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     if (isRunning) {
@@ -475,13 +484,12 @@
                     totalSeconds = sec;
                     remainingSeconds = sec;
                     hideMessage();
-                    statusBadge.textContent = '準備就緒';
+                    statusBadge.textContent = '♡ 準備就緒 ♡';
                     updateControlsUI();
                     updateDisplay();
                 });
             });
 
-            // 音效開關
             soundToggle.addEventListener('click', () => {
                 isSoundEnabled = !isSoundEnabled;
                 if (isSoundEnabled) {
@@ -493,7 +501,6 @@
                 }
             });
 
-            // 關閉訊息框
             closeMessageBtn.addEventListener('click', hideMessage);
 
             // 初始化畫面
